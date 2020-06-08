@@ -11,7 +11,7 @@ class IndexCest
     // }
 
     // tests
-    public function tryToTest(ApiTester $I)
+    public function showAllPosts(ApiTester $I)
     {
         // $I->sendGET('');
         // $I->seeResponseCodeIs(200);

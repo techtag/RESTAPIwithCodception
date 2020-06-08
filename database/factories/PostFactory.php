@@ -7,11 +7,11 @@ use Faker\Generator as Faker;
 
 $factory->define(Post::class, function (Faker $faker) {
     return [
-        'title'=>$faker->sentence(5),
-        'content'=>$faker->paragraph(4,true),
-        'primary_image'=>$faker->imageUrl(),
-        'thumbnail_image'=>$faker->imageUrl(),
-        'slug'=>$faker->sentence(5),
-        'author'=>$faker->name
+        Post::TITLE=>$faker->sentence(5),
+        Post::CONTENT=>$faker->paragraph(4,true),
+        Post::PRIMARY_IMAGE=>$faker->imageUrl(),
+        Post::THUMBNAIL_IMAGE=>$faker->imageUrl(),
+        Post::SLUG=>$faker->slug,
+        Post::AUTHOR=>$faker->name
     ];
 });

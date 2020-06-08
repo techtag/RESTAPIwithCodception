@@ -1,8 +1,9 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
+use App\Post;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreatePostsTable extends Migration
 {
@@ -13,14 +14,14 @@ class CreatePostsTable extends Migration
      */
     public function up()
     {
-        Schema::create('posts', function (Blueprint $table) {
-            $table->id();
-            $table->string('title');
-            $table->text('content');
-            $table->string('primary_image');
-            $table->string('thumbnail_image');
-            $table->string('slug');
-            $table->string('author');
+        Schema::create(Post::TABLE_NAME, function (Blueprint $table) {
+            $table->id(Post::ID);
+            $table->string(Post::TITLE);
+            $table->text(Post::CONTENT);
+            $table->string(Post::PRIMARY_IMAGE);
+            $table->string(Post::THUMBNAIL_IMAGE);
+            $table->string(Post::SLUG);
+            $table->string(Post::AUTHOR);
             $table->timestamps();
         });
     }

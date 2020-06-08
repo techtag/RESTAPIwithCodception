@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Post;
+use Exception;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
 
 class PostController extends Controller
 {
@@ -28,17 +30,7 @@ class PostController extends Controller
                 ]
             ]
         ];
-        return $posts;
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        return response($posts);
     }
 
     /**
@@ -49,7 +41,36 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
+       $validator=Validator::make(
+           $request->all(),
+           [
+               Post::TITLE => 'required',
+               Post::CONTENT => 'required',
+               Post::PRIMARY_IMAGE => 'required',
+               Post::THUMBNAIL_IMAGE => 'required',
+               Post::SLUG => 'required',
+               Post::AUTHOR => 'required',
+           ]
+        );
+       
+       try{
+        if ($validator->fails()){
+            throw new \Exception('Failed',400);
+        }   
+        $post = new Post();
+        $post->setAttribute(Post::TITLE, $request->get(Post::TITLE));
+        $post->setAttribute(Post::CONTENT, $request->get(Post::CONTENT));
+        $post->setAttribute(Post::PRIMARY_IMAGE, $request->get(Post::PRIMARY_IMAGE));
+        $post->setAttribute(Post::THUMBNAIL_IMAGE, $request->get(Post::THUMBNAIL_IMAGE));
+        $post->setAttribute(Post::SLUG, $request->get(Post::SLUG));
+        $post->setAttribute(Post::AUTHOR, $request->get(Post::AUTHOR));
+        $post->save();
+       }catch(\Exception $e){
+            return response(['message'=>$e->getMessage()],$e->getCode());
+       }
+       
+
+       return response('Success');
     }
 
     /**
@@ -60,18 +81,16 @@ class PostController extends Controller
      */
     public function show($id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
+        $post=Post::find($id);
+        $post=[
+            'data'=>[
+                $post->id => [
+                    POST::TITLE => $post->title,
+                    POST::CONTENT => $post->content
+                ]
+            ]
+        ];
+        return response($post);
     }
 
     /**
@@ -83,7 +102,21 @@ class PostController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $post=Post::where(Post::ID,$id)->first();
+        $post->setAttribute(Post::TITLE, $request->get(Post::TITLE));
+        $post->setAttribute(Post::CONTENT, $request->get(Post::CONTENT));
+        // $post->setAttribute(Post::PRIMARY_IMAGE, $request->get(Post::PRIMARY_IMAGE));
+        // $post->setAttribute(Post::THUMBNAIL_IMAGE, $request->get(Post::THUMBNAIL_IMAGE));
+        // $post->setAttribute(Post::SLUG, $request->get(Post::SLUG));
+        // $post->setAttribute(Post::AUTHOR, $request->get(Post::AUTHOR));
+        $post->save();
+        return response([
+            'data'=>[
+                $post->id => [
+                    POST::TITLE => $post->getAttribute(Post::TITLE),
+                    POST::CONTENT => $post->getAttribute(Post::CONTENT),
+                ]
+        ]]);
     }
 
     /**
@@ -94,6 +127,7 @@ class PostController extends Controller
      */
     public function destroy($id)
     {
-        //
+        Post::destroy($id);
+        return response('Success');
     }
 }
