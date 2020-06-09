@@ -24,4 +24,10 @@ class DeleteCest
         $I->dontSeeRecord(Post::TABLE_NAME,[Post::ID=>$post->id]);
         $I->assertEquals('Success',$response);
     }
+
+    public function return404WhenCantFindRecordToDelete(ApiTester $I){
+        $id=99;
+        $I->sendDELETE('post/'.$id);
+        $I->seeResponseCodeIs(404);
+    }
 }

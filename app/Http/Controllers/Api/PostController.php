@@ -17,20 +17,16 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts=Post::all();
-        $posts=[
-            'data'=>[
-                $posts[0]->id=>[
-                    POST::TITLE => $posts[0]->title,
-                    POST::CONTENT => $posts[0]->content
-                ],
-                $posts[1]->id=>[
-                    POST::TITLE => $posts[1]->title,
-                    POST::CONTENT => $posts[1]->content
-                ]
-            ]
-        ];
-        return response($posts);
+        try{
+            $posts=Post::paginate(3,[Post::TITLE,Post::CONTENT])->toArray();
+            
+            if(empty($posts['data'])){
+                throw new \Exception('No Records Found',404);
+            }
+            return response($posts);
+        }catch(\Exception $e){
+            return response(['message' => $e->getMessage()],$e->getCode());
+        }
     }
 
     /**
@@ -65,12 +61,10 @@ class PostController extends Controller
         $post->setAttribute(Post::SLUG, $request->get(Post::SLUG));
         $post->setAttribute(Post::AUTHOR, $request->get(Post::AUTHOR));
         $post->save();
+        return response('Success');
        }catch(\Exception $e){
             return response(['message'=>$e->getMessage()],$e->getCode());
        }
-       
-
-       return response('Success');
     }
 
     /**
@@ -81,16 +75,25 @@ class PostController extends Controller
      */
     public function show($id)
     {
-        $post=Post::find($id);
-        $post=[
-            'data'=>[
-                $post->id => [
-                    POST::TITLE => $post->title,
-                    POST::CONTENT => $post->content
+        try{
+            $post=Post::find($id);
+
+            if(!$post){
+                throw new \Exception('Cannot find record', 404);
+            }
+
+            $post=[
+                'data'=>[
+                    $post->id => [
+                        POST::TITLE => $post->title,
+                        POST::CONTENT => $post->content
+                    ]
                 ]
-            ]
-        ];
-        return response($post);
+            ];
+            return response($post);
+        }catch(\Exception $e){
+            return response(['message' => $e->getMessage()], $e->getCode());
+        }
     }
 
     /**
@@ -102,21 +105,28 @@ class PostController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $post=Post::where(Post::ID,$id)->first();
-        $post->setAttribute(Post::TITLE, $request->get(Post::TITLE));
-        $post->setAttribute(Post::CONTENT, $request->get(Post::CONTENT));
-        // $post->setAttribute(Post::PRIMARY_IMAGE, $request->get(Post::PRIMARY_IMAGE));
-        // $post->setAttribute(Post::THUMBNAIL_IMAGE, $request->get(Post::THUMBNAIL_IMAGE));
-        // $post->setAttribute(Post::SLUG, $request->get(Post::SLUG));
-        // $post->setAttribute(Post::AUTHOR, $request->get(Post::AUTHOR));
-        $post->save();
-        return response([
-            'data'=>[
-                $post->id => [
-                    POST::TITLE => $post->getAttribute(Post::TITLE),
-                    POST::CONTENT => $post->getAttribute(Post::CONTENT),
-                ]
-        ]]);
+        try{
+            $post=Post::where(Post::ID,$id)->first();
+            if(!$post){
+                throw new \Exception("Cant find record to update",404);
+            }
+            $post->setAttribute(Post::TITLE, $request->get(Post::TITLE));
+            $post->setAttribute(Post::CONTENT, $request->get(Post::CONTENT));
+            // $post->setAttribute(Post::PRIMARY_IMAGE, $request->get(Post::PRIMARY_IMAGE));
+            // $post->setAttribute(Post::THUMBNAIL_IMAGE, $request->get(Post::THUMBNAIL_IMAGE));
+            // $post->setAttribute(Post::SLUG, $request->get(Post::SLUG));
+            // $post->setAttribute(Post::AUTHOR, $request->get(Post::AUTHOR));
+            $post->save();
+            return response([
+                'data'=>[
+                    $post->id => [
+                        POST::TITLE => $post->getAttribute(Post::TITLE),
+                        POST::CONTENT => $post->getAttribute(Post::CONTENT),
+                    ]
+            ]]);
+        }catch(\Exception $e){
+            return response(['message'=>$e->getMessage()],$e->getCode());
+        }
     }
 
     /**
@@ -127,7 +137,14 @@ class PostController extends Controller
      */
     public function destroy($id)
     {
-        Post::destroy($id);
-        return response('Success');
+        try{
+            $deleted=Post::destroy($id);
+            if(!$deleted){
+                throw new \Exception('Could not find record to delete',404);
+            }
+            return response('Success');
+        }catch(\Exception $e){
+            return response(['message'=>$e->getMessage()],$e->getCode());
+        }
     }
 }

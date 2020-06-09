@@ -4,7 +4,7 @@ modules:
         - \Helper\Api
         - Asserts
         - REST:
-            url: http://rest-api.test/api/
+            url: http://restapiwithcodception.test/api/
             depends: Laravel5
         - Laravel5:
             environment_file: .env.testing

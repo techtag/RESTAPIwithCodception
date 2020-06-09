@@ -15,3 +15,4 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::apiResource('post','Api\PostController');
+Route::post('user',['uses' => 'Api\UserController@store']);

@@ -36,4 +36,10 @@ class UpdateCest
         $I->seeRecord(Post::TABLE_NAME,$updates);
         $I->assertEquals($expectedJson,$response);
     }
+    public function return404WhenItCantFindRecordsToUpdate(ApiTester $I){
+        $id=99;
+
+        $I->sendPUT('post/'.$id);
+        $I->seeResponseCodeIs(404);
+    }
 }

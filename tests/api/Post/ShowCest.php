@@ -33,4 +33,10 @@ class ShowCest
         $I->seeResponseCodeIs(200);
         $I->assertEquals($expectedJson,$response);
     }
+
+    public function return404WhenRecordCannotBeFound(ApiTester $I){
+        $id=54;
+        $I->sendGET('post/'.$id);
+        $I->seeResponseCodeIs(404);
+    }
 }
